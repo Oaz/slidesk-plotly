@@ -1,19 +1,46 @@
 class PlotlyCodeRenderer {
     constructor(selector) {
         this.selector = selector;
+        this.repeatTimers = new Map(); // Track active timers for cleanup
         this.init();
     }
 
     init() {
         document.querySelectorAll(this.selector).forEach(element => {
-            if (element.dataset.plotlyProcessed === 'true') {
-                return;
-            }
             this.renderPlot(element);
         });
     }
 
+    tearDown() {
+        // Clear all active repeat timers
+        for (const [codeElement, timerId] of this.repeatTimers.entries()) {
+            clearTimeout(timerId);
+        }
+        this.repeatTimers.clear();
+
+        // Reset all processed elements for potential reuse
+        document.querySelectorAll(this.selector).forEach(element => {
+            element.dataset.plotlyProcessed = 'false';
+            element.classList.remove('plotly-code--rendered', 'plotly-code--loading', 'plotly-code--error');
+            element.style.display = '';
+
+            // Remove any existing plot containers or error messages
+            let nextSibling = element.nextSibling;
+            while (nextSibling && (
+                nextSibling.classList?.contains('plotly-container') ||
+                nextSibling.classList?.contains('plotly-error')
+            )) {
+                const toRemove = nextSibling;
+                nextSibling = nextSibling.nextSibling;
+                toRemove.remove();
+            }
+        });
+    }
+
     async renderPlot(codeElement) {
+        // Clear any existing timer for this element
+        this.clearRepeatTimer(codeElement);
+
         // Add loading state
         codeElement.classList.add('plotly-code--loading');
 
@@ -27,8 +54,41 @@ class PlotlyCodeRenderer {
             codeElement.classList.add('plotly-code--rendered');
             codeElement.style.display = 'none';
             codeElement.dataset.plotlyProcessed = 'true';
+
+            // Check for repeat property and set up auto-refresh
+            this.setupRepeatIfNeeded(codeElement, plotData);
         } catch (error) {
             this.handleError(codeElement, error);
+        }
+    }
+
+    setupRepeatIfNeeded(codeElement, plotData) {
+        if (plotData && plotData.repeat && typeof plotData.repeat === 'number' && plotData.repeat > 0) {
+            const timerId = setTimeout(() => {
+                // Reset processing flag to allow re-rendering
+                codeElement.dataset.plotlyProcessed = 'false';
+                codeElement.classList.remove('plotly-code--rendered');
+                
+                // Remove existing plot container
+                const existingContainer = codeElement.nextSibling;
+                if (existingContainer && existingContainer.classList.contains('plotly-container')) {
+                    existingContainer.remove();
+                }
+                
+                // Re-render the plot
+                this.renderPlot(codeElement);
+            }, plotData.repeat);
+
+            // Store timer ID for cleanup
+            this.repeatTimers.set(codeElement, timerId);
+        }
+    }
+
+    clearRepeatTimer(codeElement) {
+        const timerId = this.repeatTimers.get(codeElement);
+        if (timerId) {
+            clearTimeout(timerId);
+            this.repeatTimers.delete(codeElement);
         }
     }
 
@@ -92,9 +152,8 @@ class PlotlyCodeRenderer {
             }
         };
 
-        if (plotData.data && plotData.layout) {
-            const layout = this.deepMerge(presentationLayout, plotData.layout);
-            console.log(layout);
+        if (plotData.data) {
+            const layout = plotData.layout ? this.deepMerge(presentationLayout, plotData.layout) : presentationLayout;
             const config = { ...defaultConfig, ...(plotData.config || {}) };
             return Plotly.newPlot(container, plotData.data, layout, config);
         } else if (Array.isArray(plotData)) {
@@ -139,6 +198,10 @@ class PlotlyCodeRenderer {
 
     handleError(codeElement, error) {
         console.error('Plotly rendering error:', error);
+        
+        // Clear any repeat timer on error
+        this.clearRepeatTimer(codeElement);
+        
         codeElement.classList.remove('plotly-code--loading');
         codeElement.classList.add('plotly-code--error');
         codeElement.title = `Error: ${error.message}`;

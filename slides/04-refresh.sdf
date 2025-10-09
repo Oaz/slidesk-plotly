@@ -1,0 +1,12 @@
+## Auto-refreshed Data
+
+```plotly
+{
+   data: [{
+       x: [1, 2, 3, 4],
+       y: [Math.random(), Math.random(), Math.random(), Math.random()],
+       type: 'scatter'
+   }],
+   repeat: 500  // Refresh every 500 milliseconds
+}
+```
