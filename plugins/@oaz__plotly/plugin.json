@@ -1,0 +1,11 @@
+{
+  "addStyles": ["plugins/@oaz__plotly/plotly-renderer.css"],
+  "addScripts": [
+    "plugins/@oaz__plotly/plotly-3.1.0.min.js",
+    "plugins/@oaz__plotly/plotly-renderer.js",
+    "plugins/@oaz__plotly/plugin.js"
+  ],
+  "onSlideChange": "window.slidesk.plotlyChange();",
+  "files": ["plotly-renderer.css", "plotly-3.1.0.min.js", "plotly-renderer.js", "plugin.js"],
+  "tags": ["plotly", "diagram"]
+}

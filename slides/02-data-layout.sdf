@@ -1,0 +1,22 @@
+## Data + Layout
+
+```plotly
+{
+    data: [
+        {
+            x: ['Apples', 'Oranges', 'Bananas', 'Grapes'],
+            y: [20, 15, 30, 25],
+            type: 'bar',
+            marker: {
+                color: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+            }
+        }
+    ],
+    layout: {
+        title: { text: 'Fruit Sales' },
+        xaxis: { title: { text: 'Fruit Type' } },
+        yaxis: { title: { text: 'Quantity Sold' } },
+        height: 600
+    }
+}
+```

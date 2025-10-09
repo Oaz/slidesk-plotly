@@ -1,0 +1,7 @@
+/::
+add_styles: assets/theme.css
+::/
+
+## Example of Plotly usage in SliDesk
+
+!include(slides)
