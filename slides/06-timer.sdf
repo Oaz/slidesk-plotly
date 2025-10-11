@@ -1,0 +1,49 @@
+## Timer
+
+```plotly
+function(state) {
+    const seconds = 20;
+    const max = seconds * 1000;
+    const now = new Date();
+    if (!state.start) {
+        state.start = now;
+    }
+    let elapsed = now - state.start;
+    if (elapsed > max) {
+        elapsed = max;
+    }
+    return {
+      data: [
+              {
+                y: [''],
+                x: [elapsed],
+                type: 'bar',
+                orientation: 'h',
+                text: [Math.round((max-elapsed) / 1000)],
+                textposition: 'inside',
+                textfont: {
+                  color: 'white',
+                  size: 36
+                }
+              },
+              {
+                y: [''],
+                x: [max-elapsed],
+                type: 'bar',
+                orientation: 'h'
+              }
+            ],
+      layout: {
+        width:1500,
+        height:250,
+        barmode: 'stack',
+        showlegend: false,
+        xaxis: {
+          visible: false
+        }
+      },
+      repeat: 200,
+      state: state
+   };
+}
+```

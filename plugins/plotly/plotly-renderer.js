@@ -1,22 +1,25 @@
 class PlotlyCodeRenderer {
     constructor(selector) {
         this.selector = selector;
-        this.repeatTimers = new Map(); // Track active timers for cleanup
+        this.states = new Map();
         this.init();
     }
 
     init() {
         document.querySelectorAll(this.selector).forEach(element => {
+            this.states.set(element, {});
             this.renderPlot(element);
         });
     }
 
     tearDown() {
         // Clear all active repeat timers
-        for (const [codeElement, timerId] of this.repeatTimers.entries()) {
-            clearTimeout(timerId);
+        for (const [codeElement, state] of this.states.entries()) {
+            if (state.timer) {
+                clearTimeout(state.timer);
+            }
         }
-        this.repeatTimers.clear();
+        this.states.clear();
 
         // Reset all processed elements for potential reuse
         document.querySelectorAll(this.selector).forEach(element => {
@@ -79,29 +82,37 @@ class PlotlyCodeRenderer {
                 this.renderPlot(codeElement);
             }, plotData.repeat);
 
-            // Store timer ID for cleanup
-            this.repeatTimers.set(codeElement, timerId);
+            // Store timer ID in state object
+            const state = this.states.get(codeElement);
+            state.timer = timerId;
         }
     }
 
     clearRepeatTimer(codeElement) {
-        const timerId = this.repeatTimers.get(codeElement);
-        if (timerId) {
-            clearTimeout(timerId);
-            this.repeatTimers.delete(codeElement);
+        const state = this.states.get(codeElement);
+        if (state.timer) {
+            clearTimeout(state.timer);
+            state.timer = null;
         }
     }
 
     async evaluateCode(codeElement) {
         const code = codeElement.textContent.trim();
+        
+        // Get the state object for this element
+        const state = this.states.get(codeElement);
 
-        // Use Function constructor for slightly better security
-        const func = new Function(`return (${code})`);
-        let result = func();
+        // Use Function constructor and pass state as argument
+        const func = new Function('state', `return (${code})`);
+        let result = func(state);
 
         // Handle async data functions
         if (typeof result === 'function') {
-            result = await result();
+            result = await result(state);
+        }
+
+        if (result.state) {
+            this.states.set(codeElement, result.state);
         }
 
         return result;

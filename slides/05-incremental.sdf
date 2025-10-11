@@ -1,0 +1,31 @@
+## Incremental Data
+
+```plotly
+function(state) {
+    size = 30;
+    if (state.y) {
+        const lastX = state.x[state.x.length - 1];
+        state.x.push(lastX + 1);
+        state.y.push(Math.random());
+    } else {
+        state.x = Array.from({length: size}, (_, i) => i + 1);
+        state.y = Array.from({length: size}, () => Math.random());
+    }
+    if (state.x.length > size) {
+        state.x = state.x.slice(-size);
+        state.y = state.y.slice(-size);
+    }
+    return {
+      data: [{
+          x: state.x,
+          y: state.y,
+          type: 'scatter'
+      }],
+      layout: {
+        width: 1500
+      },
+      repeat: 500,
+      state: state
+   };
+}
+```
