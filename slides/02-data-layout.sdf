@@ -1,4 +1,5 @@
 ## Data + Layout
+//@ [] 00:30
 
 ```plotly
 {
@@ -20,3 +21,10 @@
     }
 }
 ```
+
+/*
+A plotly graph with custom layout:
+- title
+- axis labels
+- custom size
+*/

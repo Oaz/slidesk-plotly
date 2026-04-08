@@ -1,4 +1,5 @@
 ## Timer
+//@ [] 00:40
 
 ```plotly
 function(state) {
@@ -47,3 +48,10 @@ function(state) {
    };
 }
 ```
+
+/*
+Using state, current date and refreshs, we can simulate a timer.
+The timer duration (here 20 seconds) is hardcoded.
+The state is just the starting date which is set only once at first call.
+At each refresh, we compute the elapsed time between the starting date and the current date and we draw a bar plot accordingly.
+*/

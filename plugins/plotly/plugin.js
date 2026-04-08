@@ -1,5 +1,5 @@
 
-window.slidesk.plotlyChange = () => {
+window.slidesk.plotlyChange = (x) => {
     if(window.slidesk.plotlyCodeRenderer) {
         window.slidesk.plotlyCodeRenderer.tearDown();
         delete window.slidesk.plotlyCodeRenderer;

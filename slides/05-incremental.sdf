@@ -1,4 +1,5 @@
 ## Incremental Data
+//@ [] 00:30
 
 ```plotly
 function(state) {
@@ -29,3 +30,7 @@ function(state) {
    };
 }
 ```
+
+/*
+These are still random number but a state is memorized between refreshs so that the curve can be built incrementally
+*/

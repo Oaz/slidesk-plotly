@@ -1,4 +1,5 @@
 ## Auto-refreshed Data
+//@ [] 00:40
 
 ```plotly
 {
@@ -10,3 +11,8 @@
    repeat: 500  // Refresh every 500 milliseconds
 }
 ```
+
+/*
+Automatically refreshed data.
+These are just random numbers that are refreshed every 500 milliseconds
+*/
